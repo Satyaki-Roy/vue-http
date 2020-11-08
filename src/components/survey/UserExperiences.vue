@@ -3,9 +3,10 @@
     <base-card>
       <h2>Submitted Experiences</h2>
       <div>
-        <base-button>Load Submitted Experiences</base-button>
+        <base-button @click="loadExperiences">Load Submitted Experiences</base-button>
       </div>
-      <ul>
+      <p v-if="isLoading">Loading...</p>
+      <ul v-else>
         <survey-result
           v-for="result in results"
           :key="result.id"
@@ -21,10 +22,39 @@
 import SurveyResult from './SurveyResult.vue';
 
 export default {
-  props: ['results'],
   components: {
     SurveyResult,
   },
+  data() {
+    return {
+      results: [],
+      isLoading: false
+    }
+  },
+  methods: {
+    loadExperiences() {
+      this.isLoading = true;
+      fetch('url')
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+        })
+        .then((data) => {
+          for (const id in data) {
+            this.results.push({
+              id,
+              name: data[id]['name'],
+              rating: data[id]['rating'],
+            });
+          }
+          this.isLoading = false;
+        })
+    }
+  },
+  mounted() {
+    this.loadExperiences();
+  }
 };
 </script>
 
